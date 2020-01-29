@@ -1,6 +1,6 @@
-FROM ubuntu:latest
+FROM ubuntu:18.04
 
-#WORKDIR /spring-petclinic
+WORKDIR /spring-petclinic
 
 COPY . /spring-petclinic
 
@@ -11,6 +11,6 @@ RUN apt-get update && \
 
 # RUN mvn /spring-petclinic/package
 
-CMD ["java","-jar","/spring-petclinic/target/*.jar"]
+ENTRYPOINT ["java","-jar","target/spring-petclinic-2.2.0.BUILD-SNAPSHOT.jar"]
 
 EXPOSE 8080
