@@ -7,13 +7,14 @@ WORKDIR /spring-petclinic
 COPY pom.xml pom.xml
 
 #RUN apt-get update && \
-    #apt-get install -y maven
+#apt-get install -y maven
 
-RUN mvn dependency:resolve
+RUN mvn -B dependency:resolve-plugins dependency:resolve
 
 COPY . /spring-petclinic
 
 RUN mvn package
+
 
 #FROM ubuntu:18.04
 
@@ -22,7 +23,7 @@ FROM openjdk:8-jdk-alpine
 WORKDIR /spring-petclinic
 
 #RUN apt-get update && \
-    #apt-get install -y openjdk-8-jdk
+#apt-get install -y openjdk-8-jdk
 
 COPY --from=build /spring-petclinic/target target
 
