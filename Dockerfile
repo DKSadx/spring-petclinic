@@ -27,6 +27,6 @@ WORKDIR /spring-petclinic
 
 COPY --from=build /spring-petclinic/target target
 
-ENTRYPOINT ["java","-jar","target/spring-petclinic-2.2.0.BUILD-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-jar","-Dspring.profiles.active=mysql","target/spring-petclinic-2.2.0.BUILD-SNAPSHOT.jar"]
 
 EXPOSE 8080

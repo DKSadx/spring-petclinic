@@ -1,0 +1,10 @@
+FROM mysql:5.7
+
+WORKDIR /petclinic
+
+COPY src/main/resources/db/mysql/user.sql .
+
+RUN /etc/init.d/mysql start && \
+        mysql -u root < user.sql
+
+EXPOSE 3306
