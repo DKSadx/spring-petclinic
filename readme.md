@@ -1,3 +1,29 @@
+### Using spring-petclinic with Dockerfiles
+
+```bash
+  git clone https://github.com/DKSadx/spring-petclinic.git
+
+  cd spring-petclinic
+
+  git checkout test-branch
+
+  # Building mySQL image
+  docker build -t mysql:petclinic src/main/resources/db/mysql
+
+  # Running mySQL container
+  docker run -d --name mysql -p 3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=true -e MYSQL_USER=petclinic -e MYSQL_PASSWORD=petclinic -e MYSQL_DATABASE=petclinic mysql:petclinic
+
+  # Building spring image
+  docker build -t spring:petclinic .
+
+  # Running spring container
+  docker run --name -d spring --link mysql -p 8080:8080 -it spring:petclinic
+```
+
+_The app runs on localhost:8080_
+
+---
+
 # Spring PetClinic Sample Application [![Build Status](https://travis-ci.org/spring-projects/spring-petclinic.png?branch=master)](https://travis-ci.org/spring-projects/spring-petclinic/)
 Deploy this sample application to Pivotal Web Services:
 
