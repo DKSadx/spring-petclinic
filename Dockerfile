@@ -1,5 +1,4 @@
 FROM ubuntu:18.04 AS build
-#FROM maven AS build
 
 WORKDIR /spring-petclinic
 
@@ -16,12 +15,11 @@ RUN mvn package
 
 
 FROM ubuntu:18.04
-#FROM openjdk:8-jdk-alpine
 
 WORKDIR /spring-petclinic
 
 RUN apt-get update && \
-apt-get install -y openjdk-8-jdk
+apt-get install -y openjdk-8-jdk iputils-ping
 
 COPY --from=build /spring-petclinic/target target
 
