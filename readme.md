@@ -17,7 +17,7 @@
   docker build -t spring:petclinic .
 
   # Running spring container
-  docker run --name -d spring --link mysql -p 8080:8080 -it spring:petclinic
+  docker run --name spring -d --link mysql -p 8080:8080 -it spring:petclinic
 ```
 
 _The app runs on localhost:8080_
