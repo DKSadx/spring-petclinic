@@ -9,7 +9,7 @@ echo "--- Building spring app ---"
 mvn package
 
 echo "--- Copying .jar file ---"
-cp /target/spring-petclinic-2.2.0.BUILD-SNAPSHOT.jar /dockerfiles
+cp target/spring-petclinic-2.2.0.BUILD-SNAPSHOT.jar dockerfiles
 
 echo "--- Building runtime image ---"
 cd dockerfiles && docker build -t localhost:5000/spring -f DockerBuild .

@@ -1,7 +1,9 @@
 FROM openjdk:8-jdk-alpine
 
-ADD run.sh run.sh
+COPY . .
 
 RUN chmod +x run.sh
 
 CMD ["./run.sh"]
+
+EXPOSE 8080
