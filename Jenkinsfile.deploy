@@ -1,0 +1,14 @@
+def IMAGE_NAME = "run"
+def IMAGE_TAG = "v1"
+def CONTAINER_NAME = "run"
+
+node {
+  def deploy
+
+  stage('Run app') {
+    // Stop and remove container if it exists
+    sh "docker stop ${CONTAINER_NAME} || true && docker rm ${CONTAINER_NAME} || true"
+    sh "docker run -d --rm --name ${CONTAINER_NAME} --link mysql -p 1111:8080 -it ${IMAGE_NAME}:${IMAGE_TAG}"
+  }
+
+}
