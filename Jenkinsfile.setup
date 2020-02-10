@@ -1,0 +1,32 @@
+def IMAGE_NAME = "mysql"
+def IMAGE_TAG = "petclinic"
+def CONTAINER_NAME = "mysql"
+
+node {
+  def build
+
+  stage('Clone repository') {
+    sh '''
+          if [ -d "${FOLDER_NAME}" ]; then
+              rm -rf ${FOLDER_NAME}
+          fi
+
+          git clone ${GITHUB_REPO} ${FOLDER_NAME}
+          cd "${FOLDER_NAME}"
+          git checkout ${BRANCH_NAME}
+    '''
+  }
+
+  stage('Build MySQL image') {
+    dir("${env.WORKSPACE}/${FOLDER_NAME}") {
+      sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} src/main/resources/db/mysql"
+    }
+  }
+
+  stage('Run MySQL container') {
+    // Stop and remove container if it exists
+    sh "docker stop ${CONTAINER_NAME} || true && docker rm ${CONTAINER_NAME} || true"
+    sh "docker run -d --name ${CONTAINER_NAME} -p 3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=true -e MYSQL_USER=${MYSQL_USER} -e MYSQL_PASSWORD=${MYSQL_PASSWORD} -e MYSQL_DATABASE=${MYSQL_DATABASE} ${IMAGE_NAME}:${IMAGE_TAG}"
+  }
+
+}
