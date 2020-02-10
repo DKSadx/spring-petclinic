@@ -3,32 +3,34 @@
 ```bash
   git clone https://github.com/DKSadx/spring-petclinic.git
   cd spring-petclinic
-  git checkout test-branch
+  git checkout features
 ```
 
-#### with docker-compose
+#### with Dockerfiles
 
 ```bash
-  docker-compose up
-```
-
-#### or with Dockerfiles
-
-```bash
-  # Building mySQL image
+  # Build mySQL image
   docker build -t mysql:petclinic src/main/resources/db/mysql
 
-  # Running mySQL container
+  # Start mySQL container
   docker run -d --name mysql -p 3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=true -e MYSQL_USER=petclinic -e MYSQL_PASSWORD=petclinic -e MYSQL_DATABASE=petclinic mysql:petclinic
 
-  # Building spring image
-  docker build -t spring:petclinic .
+  # Build spring image
+  docker build -t build:v1 .
 
-  # Running spring container
-  docker run --name -d spring --link mysql -p 8080:8080 -it spring:petclinic
+  # Start build inside build container
+  docker run --name build --mount type=bind,source=/root/.m2,target=/root/.m2 build:v1
+
+  # Copy jar file from build container
+  docker cp build:target/spring-petclinic-2.2.0.BUILD-SNAPSHOT.jar jar/
+  cd jar && docker build -t run:v1 .
+
+  # Start spring container
+  docker run -d --rm --name run --link mysql -p 1111:8080 -it run:v1
+
 ```
 
-_The app runs on localhost:8080_
+_The app runs on localhost:1111_
 
 ---
 
