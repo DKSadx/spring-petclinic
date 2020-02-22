@@ -1,5 +1,8 @@
+properties([pipelineTriggers([githubPush()])])
+
 node {
   def build
+  git url: 'https://github.com/DKSadx/spring-petclinic.git', branch: 'demo'
 
   stage('Build app') {
       // Stop and remove container if it exists
