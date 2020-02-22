@@ -8,7 +8,7 @@ node {
   stage('Run app') {
     // Stop and remove container if it exists
     sh "docker stop ${CONTAINER_NAME} || true && docker rm ${CONTAINER_NAME} || true"
-    sh "docker run -d --rm --name ${CONTAINER_NAME} --link mysql -p 1111:8080 -it ${IMAGE_NAME}:${IMAGE_TAG}"
+    sh "docker run -d --rm --net host --name ${CONTAINER_NAME} ${IMAGE_NAME}:${IMAGE_TAG}"
   }
 
 }

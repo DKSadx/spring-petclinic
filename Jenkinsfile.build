@@ -1,42 +1,33 @@
-def BUILD_IMAGE_NAME = "build"
-def BUILD_IMAGE_TAG = "v1"
-def BUILD_CONTAINER_NAME = "build"
-def DEPLOY_IMAGE_NAME = "run"
-def DEPLOY_IMAGE_TAG = "v1"
-def M2_PATH = "/root/.m2"
-
 node {
   def build
 
-  stage('Clone repository') {
-    sh '''
-          if [ -d "${FOLDER_NAME}" ]; then
-              rm -rf ${FOLDER_NAME}
-          fi
-
-          git clone ${GITHUB_REPO} ${FOLDER_NAME}
-          cd "${FOLDER_NAME}"
-          git checkout ${BRANCH_NAME}
-    '''
-  }
-
-  stage('Build image') {
-    dir("${env.WORKSPACE}/${FOLDER_NAME}") {
-      sh "docker build -t ${BUILD_IMAGE_NAME}:${BUILD_IMAGE_TAG} ."
-    }
-  }
-
   stage('Build app') {
-    // Stop and remove container if it exists
-    sh "docker stop ${BUILD_CONTAINER_NAME} || true && docker rm ${BUILD_CONTAINER_NAME} || true"
-    sh "docker run --name ${BUILD_CONTAINER_NAME} --mount type=bind,source=${M2_PATH},target=/root/.m2 ${BUILD_IMAGE_NAME}:${BUILD_IMAGE_TAG}"
+      // Stop and remove container if it exists
+      sh "docker stop ${BUILD_CONTAINER} || true && docker rm ${BUILD_CONTAINER} || true"
+      sh '''
+      docker run --name ${BUILD_CONTAINER} \
+                 --mount type=bind,source=\$HOME/.m2,target=/root/.m2 \
+                 -e GITHUB_REPO=${GITHUB_REPO} \
+                 -e FOLDER_NAME=${FOLDER_NAME} \
+                 -e BRANCH_NAME=${BRANCH_NAME} \
+                 -e UID=\$(id -u) \
+                 -e GID=\$(id -g) \
+                 build:v1
+      '''
   }
 
-  stage('Copy built file to host') {
-    dir("${env.WORKSPACE}/${FOLDER_NAME}"){
-      sh "docker cp ${BUILD_CONTAINER_NAME}:target/spring-petclinic-2.2.0.BUILD-SNAPSHOT.jar jar/"
-      sh "cd jar && docker build -t ${DEPLOY_IMAGE_NAME}:${DEPLOY_IMAGE_TAG} ."
-    }
+  stage('Copy jar file to host') {
+      sh "docker cp ${BUILD_CONTAINER}:${FOLDER_NAME}/jar ."
+      sh "docker cp ${BUILD_CONTAINER}:${FOLDER_NAME}/target/${JAR_FILE}.jar jar/"
+  }
+
+  stage('Build runtime image') {
+    sh "cd jar && docker build -t run:${DEPLOY_IMAGE_TAG} ."
+  }
+
+  stage('Tag and push the image to docker hub') {
+      sh "docker tag run:${DEPLOY_IMAGE_TAG} localhost:5000/run:${DEPLOY_IMAGE_TAG}"
+      sh "docker push localhost:5000/run:${DEPLOY_IMAGE_TAG}"
   }
 
 }

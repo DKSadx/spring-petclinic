@@ -1,19 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
-echo "--- Cloning git repository ---"
-git clone https://github.com/DKSadx/spring-petclinic.git
-cd spring-petclinic
-git checkout test-branch
+echo "=== Cloning the demo-app repository ==="
+git clone $GITHUB_REPO
+cd $FOLDER_NAME
+git checkout $BRANCH_NAME
 
-echo "--- Building spring app ---"
+echo "=== Building the app ==="
 mvn package
 
-echo "--- Copying .jar file ---"
-cp target/spring-petclinic-2.2.0.BUILD-SNAPSHOT.jar dockerfiles
-
-echo "--- Building runtime image ---"
-cd dockerfiles && docker build -t localhost:5000/spring -f DockerBuild .
-
-echo "--- Pushing runtime image to local docker repository/hub ---"
-docker push localhost:5000/spring 
-
+echo "=== Changing .jar UID/GID from root:root to hosts UID/GID ==="
+chown $UID:$GID target/*.jar
